@@ -29,9 +29,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="PEPlugin">
       <HintPath>..\..\..\..\Downloads\3d改造モノ\PmxEditor_0252\Lib\PEPlugin\PEPlugin.dll</HintPath>
+    </Reference>
+    <Reference Include="SlimDX">
+      <HintPath>..\..\..\..\Downloads\3d改造モノ\PmxEditor_0252\Lib\SlimDX\x86\SlimDX.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -52,16 +58,17 @@
       <DependentUpon>AttributeEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Class1.cs" />
+    <Compile Include="PmxUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Documents\Visual Studio 2013\Projects\DrawSpline\spline\trunk\DrawSpline\DrawSpline.csproj">
-      <Project>{13b54267-9ef9-44a5-9242-bc6b365f8a42}</Project>
-      <Name>DrawSpline</Name>
-    </ProjectReference>
     <ProjectReference Include="..\AttEditorWin\AttEditorWin.csproj">
       <Project>{c9f9be49-89d3-4eac-b9f6-4b1424358939}</Project>
       <Name>AttEditorWin</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DrawSpline\DrawSpline.csproj">
+      <Project>{13b54267-9ef9-44a5-9242-bc6b365f8a42}</Project>
+      <Name>DrawSpline</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
