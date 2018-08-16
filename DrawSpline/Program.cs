@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -16,7 +17,12 @@ namespace DrawSpline
     {
       Application.EnableVisualStyles();
       Application.SetCompatibleTextRenderingDefault(false);
-      Application.Run(new SplineForm());
+      SplineForm mainForm = new SplineForm();
+      var Points = new List<Point>();
+      Points.Add(new Point(14, 60));
+      Points.Add(new Point(19, 10));
+      mainForm.SetPoints(Points);
+      Application.Run(mainForm);
     }
 
     public static SplineForm SplineStarter(Action a)

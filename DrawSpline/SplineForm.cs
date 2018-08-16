@@ -157,8 +157,16 @@ namespace DrawSpline
     Action OnUpdateClicked;
     List<TextBox> textBoxes ;
     const float cpSize = 15;
-    double[] cxs = new double[] { 150.0 , 200.0  , 400.0 , 600.0 };
-    double[] cys = new double[] { 150.0 , 300.0  , 300.0 , 150.0  };
+    List<double> cxs = new List<double> { 150.0 , 200.0  , 400.0 , 600.0 };
+    List<double> cys = new List<double> { 150.0 , 300.0  , 300.0 , 150.0  };
+
+    public void SetPoints(List<Point> points )
+    {
+      cxs = new List<double>(points.Select(p => (double)p.X));
+      cys = new List<double>(points.Select(p => (double)p.Y));
+      Invalidate();
+    }
+
     public double[] xs, ys;
     int moveIndex = 0;
     bool moveFlag = false;
@@ -201,7 +209,7 @@ namespace DrawSpline
     private void SplineForm_Paint(object sender, PaintEventArgs e)
     {
       // BSplineクラスの生成
-      Spline = new BSpline(cxs, cys);
+      Spline = new BSpline(cxs.ToArray(), cys.ToArray());
       var ts = Enumerable.Range(0, 100).Select(t => t / 100.0).ToArray();
       Spline.Interpolate(ts, out xs, out ys);
       Graphics g = e.Graphics;
@@ -213,7 +221,7 @@ namespace DrawSpline
       }
       g.DrawLine(pen, TranslatePos(new Point(0, 0)), TranslatePos(new Point(100, 0) ));
       g.DrawLine(pen, TranslatePos(new Point(0, 0)), TranslatePos(new Point(0, 100) ));
-      for (int i = 0; i < cxs.Length; i++)
+      for (int i = 0; i < cxs.Count; i++)
       {
         float x = (float)cxs[i];
         float y = (float)cys[i];
@@ -227,7 +235,7 @@ namespace DrawSpline
 
     private void BeginMovePoint(MouseEventArgs e)
     {
-      for (int i = 0; i < cxs.Length; i++)
+      for (int i = 0; i < cxs.Count; i++)
       {
         Point drawPoint = TranslatePos(new Point((int)cxs[i], (int)cys[i]));
         //int ex = e.X - xOffset;
@@ -308,7 +316,7 @@ namespace DrawSpline
       if (result != DialogResult.Cancel)
       {
         List<string> lines = new List<string>();
-        for (int i = 0; i < cxs.Length; i++)
+        for (int i = 0; i < cxs.Count; i++)
         {
           lines.Add(cxs[i] + "," + cys[i]);
         }
