@@ -5,11 +5,13 @@ VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PmdWeightAuto", "PmdWeightAuto\PmdWeightAuto.csproj", "{5B4410B8-7599-4E8F-A381-AE724CC51AF4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawSpline", "..\..\..\Documents\Visual Studio 2013\Projects\DrawSpline\spline\trunk\DrawSpline\DrawSpline.csproj", "{13B54267-9EF9-44A5-9242-BC6B365F8A42}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AttEditorWPF", "AttEditorWPF\AttEditorWPF.csproj", "{B8E457D0-64CD-4F98-93AE-D4ADC2442C97}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AttEditorWin", "AttEditorWin\AttEditorWin.csproj", "{C9F9BE49-89D3-4EAC-B9F6-4B1424358939}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawSpline", "DrawSpline\DrawSpline.csproj", "{13B54267-9EF9-44A5-9242-BC6B365F8A42}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FillPoly", "FillPoly\FillPoly.csproj", "{96205601-E875-4A64-92A8-968E7D778A05}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +23,6 @@ Global
 		{5B4410B8-7599-4E8F-A381-AE724CC51AF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B4410B8-7599-4E8F-A381-AE724CC51AF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B4410B8-7599-4E8F-A381-AE724CC51AF4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{13B54267-9EF9-44A5-9242-BC6B365F8A42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{13B54267-9EF9-44A5-9242-BC6B365F8A42}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{13B54267-9EF9-44A5-9242-BC6B365F8A42}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{13B54267-9EF9-44A5-9242-BC6B365F8A42}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B8E457D0-64CD-4F98-93AE-D4ADC2442C97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B8E457D0-64CD-4F98-93AE-D4ADC2442C97}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8E457D0-64CD-4F98-93AE-D4ADC2442C97}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,6 +31,14 @@ Global
 		{C9F9BE49-89D3-4EAC-B9F6-4B1424358939}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9F9BE49-89D3-4EAC-B9F6-4B1424358939}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9F9BE49-89D3-4EAC-B9F6-4B1424358939}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13B54267-9EF9-44A5-9242-BC6B365F8A42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13B54267-9EF9-44A5-9242-BC6B365F8A42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13B54267-9EF9-44A5-9242-BC6B365F8A42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13B54267-9EF9-44A5-9242-BC6B365F8A42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96205601-E875-4A64-92A8-968E7D778A05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96205601-E875-4A64-92A8-968E7D778A05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96205601-E875-4A64-92A8-968E7D778A05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96205601-E875-4A64-92A8-968E7D778A05}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

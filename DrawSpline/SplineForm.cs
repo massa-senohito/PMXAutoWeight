@@ -205,7 +205,7 @@ namespace DrawSpline
       temp.Y = InvYTrans(temp.Y);
       return temp;
     }
-
+    private Brush CursolBrush = new SolidBrush(Color.FromArgb(160, 0, 0, 250));
     private void SplineForm_Paint(object sender, PaintEventArgs e)
     {
       // BSplineクラスの生成
@@ -221,16 +221,22 @@ namespace DrawSpline
       }
       g.DrawLine(pen, TranslatePos(new Point(0, 0)), TranslatePos(new Point(100, 0) ));
       g.DrawLine(pen, TranslatePos(new Point(0, 0)), TranslatePos(new Point(0, 100) ));
+      var cp = cpSize / 2;
       for (int i = 0; i < cxs.Count; i++)
       {
         float x = (float)cxs[i];
         float y = (float)cys[i];
         Point drawPoint = TranslatePos(new Point((int)x, (int)y));
-        var cp = cpSize / 2;
         e.Graphics.FillRectangle(brush, drawPoint.X - cp, drawPoint.Y - cp, cpSize, cpSize);
         e.Graphics.DrawString(x + " : " + y, Font, blkbrush, drawPoint.X, drawPoint.Y - 30);
 
       }
+      // カーソルの上に座標を青字で表示
+      var pos = Cursor.Position;
+      pos = (PointToClient(pos));
+      e.Graphics.FillRectangle(CursolBrush, pos.X - cp, pos.Y - cp, cpSize, cpSize);
+      var transPos = DrawPosToDataPos((pos));
+      e.Graphics.DrawString(transPos.X + " : " + transPos.Y, Font, CursolBrush,pos.X, pos.Y - 30);
     }
 
     private void BeginMovePoint(MouseEventArgs e)
@@ -287,6 +293,8 @@ namespace DrawSpline
       {
         TickMovePoint(e);
       }
+
+
 
       if(e.Button == MouseButtons.Middle)
       {

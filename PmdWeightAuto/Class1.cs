@@ -5,12 +5,14 @@ using PEPlugin.SDX;
 using SlimDX;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace PmdWeightAuto
 {
+
   public class DrawBoneFromDist : PEPluginClass
   {
     public override string Name
@@ -28,7 +30,11 @@ namespace PmdWeightAuto
           "距離から";
       }
     }
+
     DrawSpline.SplineForm form;
+    DrawSpline.SplineForm graph;
+    SpaceControll space;
+
     public static int FindUsingBone(IPXBone b, IPXVertex v)
     {
       if (v.Bone1.Equals(b))
@@ -90,11 +96,21 @@ namespace PmdWeightAuto
         foreach (var item in verts)
         {
           var usingBone = FindUsingBone(selBone, item);
-          if (usingBone == -1) continue;
-          var t = (item.Position - selBone.Position).Length() / maxDist;
+          //if (usingBone == -1) continue;
+          //var t = (item.Position - selBone.Position).Length() / maxDist;
+          var t = DistortedDist(selBone, item) / maxDist;
+          if (t>1.0)
+          {
+            t = 1.0;
+          }
+          if (t <= 0) continue;
           double x, y;
           form.Spline.Interpolate(t, out x, out y);
           float weight = (float)y / 100.0f;
+
+          Console.Write(t + " ");
+          Console.WriteLine(weight);
+
           if (usingBone == 0)
           {
             item.Weight1 = weight;
@@ -110,6 +126,25 @@ namespace PmdWeightAuto
           if (usingBone == 3)
           {
             item.Weight4 = weight;
+          }
+          if (usingBone == -1 )//&& !item.SDEF)
+          {
+            item.SDEF= false ;
+            if (item.Bone2 == null)
+            {
+              item.Weight2 = weight;
+              item.Bone2 = selBone;
+            }
+            else if (item.Bone3 == null)
+            {
+              item.Weight3 = weight;
+              item.Bone3 = selBone;
+            }
+            else if (item.Bone4 == null)
+            {
+              item.Weight4 = weight;
+              item.Bone4 = selBone;
+            }
           }
           if(t > maxT)
           {
@@ -134,7 +169,21 @@ namespace PmdWeightAuto
       View.UpdateModel();
     }
 
-    public IEnumerable<VertAttribute> GetVertAttribute()
+    private float NormalDist(IPXBone bone,IPXVertex vertex)
+    {
+      return (vertex.Position - bone.Position).Length();
+    }
+    
+    private float DistortedDist(IPXBone bone,IPXVertex vertex)
+    {
+      var dist = BoneLocalVerticePosition(bone, vertex);
+      dist.X *= space.X;
+      dist.Y *= space.Y;
+      dist.Z *= space.Z;
+      return dist.Length();
+    }
+
+    public IEnumerable<VertAttribute> GetVertAttribute(Func<IPXBone,IPXVertex,float> func)
     {
       var indices = View.GetSelectedBoneIndices();
       for (int i = 0; i < indices.Length; i++)
@@ -147,7 +196,7 @@ namespace PmdWeightAuto
           if (usingBone != -1)
           {
             float weight = BoneWeight(selBone, v);
-            yield return new VertAttribute(vi, (v.Position - selBone.Position).Length(), weight);
+            yield return new VertAttribute(vi, func(selBone,v), weight);
           }
         }
       }
@@ -162,18 +211,79 @@ namespace PmdWeightAuto
 
     public void UpdateAttEditor()
     {
-      attForm.SetAttr(GetVertAttribute().ToList());
+      attForm.SetAttr(GetVertAttribute(DistortedDist).ToList());
     }
+
+    public void UpdateGraph()
+    {
+      Pmx = Con.GetCurrentState();
+      IEnumerable<VertAttribute> verts2 = GetVertAttribute(DistortedDist);
+      var ps = verts2.Select(v => new System.Drawing.Point((int)(v.Dist * 100.0), (int)(v.Weight * 100.0f))).ToList();
+      graph.SetPoints(ps);
+    }
+
+    public void OnChangeSpace(float x,float y,float z)
+    {
+      UpdateGraph();
+      UpdateAttEditor();
+    }
+
     public void MainWindow()
     {
-      IEnumerable<VertAttribute> verts = GetVertAttribute();
+      IEnumerable<VertAttribute> verts = GetVertAttribute(DistortedDist);
+
+      form = DrawSpline.Program.SplineStarter(OnUpdate);
+      graph = DrawSpline.Program.SplineStarter(UpdateGraph);
+      graph.Text = "Distribute";
+      space = new SpaceControll(OnChangeSpace,ControllSavehandler,ControllLoadHandler);
+      space.Show();
       attForm = Program.RunForm(verts.ToList());
       attForm.OnClickedCol = OnClickedVert;
-      form = DrawSpline.Program.SplineStarter(OnUpdate);
-      var form2 = DrawSpline.Program.SplineStarter(OnUpdate);
-      form2.Name = "Distribute";
-      var ps = verts.Select(v => new System.Drawing.Point((int)(v.Dist * 200.0), (int)(v.Weight * 200.0f))).ToList();
-      form2.SetPoints(ps);
+      UpdateGraph();
+    }
+
+
+
+    public IEnumerable<IPXBone> SelectedBone()
+    {
+      var indices = View.GetSelectedBoneIndices();
+      for (int i = 0; i < indices.Length; i++)
+      {
+        var selBone = Pmx.Bone[indices[i]];
+        yield return selBone;
+      }
+    }
+
+    private void ControllLoadHandler(object sender, EventArgs e)
+    {
+      var path = space.ShowLoad();
+      var lines = File.ReadAllLines(path);
+      var bone = Pmx.Bone.First(b => b.Name == lines[0]);
+      var xyz = lines[1].Split(',').Select(float.Parse).ToArray();
+      var v3 = new V3(xyz[0],xyz[1] ,xyz[2]);
+      bone.Position = v3;
+      var targetXYZ = lines[2].Split(',').Select(float.Parse).ToArray();
+      var target = new V3(targetXYZ[0],targetXYZ[1] ,targetXYZ[2]);
+      PmxUtil.SetTargetPosition(bone , target);
+      space.XYZ = lines[3];
+      Con.Update(Pmx);
+      View.UpdateModel();
+
+    }
+
+    private void ControllSavehandler(object sender, EventArgs e)
+    {
+      var bone = SelectedBone().First();
+      var pos  = PmxUtil.TargetPosition(bone);
+      var distFieldCSV = space.XYZ;
+      var list = new string[]{
+        bone.Name,
+        bone.Position.X + "," +bone.Position.Y + "," +bone.Position.Z ,
+        (pos.X + "," + pos.Y + "," + pos.Z) ,
+        distFieldCSV,
+      };
+      var path = space.ShowSave();
+      File.WriteAllLines(path, list);
     }
 
     public override void Run(IPERunArgs args)
@@ -184,21 +294,27 @@ namespace PmdWeightAuto
       View = args.Host.Connector.View.PmxView;
       // View.SetSelectedBoneIndices(new int[] { 0});
       // View.UpdateView();
-      var indices = View.GetSelectedBoneIndices();
-      for (int i = 0; i < indices.Length; i++)
-      {
-        var selBone = Pmx.Bone[indices[i]];
-        //foreach (var item in Pmx.Vertex)
-        //View.SetSelectedVertexIndices( VertexIndiceInRange(selBone,0.8f).ToArray() );
-      var pos = PmxUtil.BoneAttitude(selBone);
-        //pos.Decompose(out Vector3 scale, out Quaternion rot, out Vector3 loc);
-        //rot = Quaternion.Invert(rot);
-        var dir = (PmxUtil.TargetPosition(selBone) - selBone.Position);
-        dir.Normalize();
-        Pmx.Primitive.AddBox(0, dir * 0.8f * 5.0f, 0.8f, 0.8f, 0.8f, selBone);
-      }
+
+
+      var selBone = SelectedBone().First();
+      //foreach (var item in Pmx.Vertex)
+      View.SetSelectedVertexIndices(VertexIndiceInRange(selBone, 0.8f).ToArray());
+      //TestMoveVertice(selBone);
+
+
+      MainWindow();
       Con.Update(Pmx);
-      View.UpdateModel_Vertex();
+      View.UpdateModel();
+    }
+
+    private void TestMoveVertice(IPXBone selBone)
+    {
+      for (int v = 0; v < Pmx.Vertex.Count; v++)
+      {
+        var item = Pmx.Vertex[v];
+        Vector3 vector3 = BoneLocalVerticePosition(selBone, item);
+        item.Position = vector3;
+      }
     }
 
     private IEnumerable<int> VertexIndiceInRange(IPXBone selBone,float range)
